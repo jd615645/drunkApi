@@ -125,21 +125,19 @@ router.post('/add/friend', (req, res, next) => {
       ref
         .child(uid)
         .once('value')
-        .then((snapshot) => {
-          let friend = snapshot.val().friends
+        .then(snapshot => snapshot.val())
+        .then((selfData) => {
+          let friend = selfData.friends
+          console.log(friend)
           ref
             .child(friendUid)
             .once('value')
             .then(snapshot => snapshot.val())
             .then((data) => {
-              console.log(data)
-              let friendData = []
-              _.each(data, (val) => {
-                friendData.push(val)
-              })
-              console.log(friendData)
-              if (friend) {
+              if (_.isArray(friend)) {
+                ref.child(uid).update({'friends': _.merge(friend, data)})
               }else {
+                ref.child(uid).update({'friends': [data]})
               }
             })
         })
